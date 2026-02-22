@@ -1,29 +1,15 @@
-# backend/Dockerfile
-FROM node:20-alpine AS base
+FROM node:20-alpine
 
-# Install dependencies for Tesseract OCR
-RUN apk add --no-cache \
-    tesseract-ocr \
-    tesseract-ocr-data-eng \
-    tesseract-ocr-data-hin \
-    curl \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Install dependencies
-FROM base AS deps
-COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
-
-# Build stage
-FROM base AS runner
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY src ./src
 COPY package.json ./
 
-# Create non-root user for security
+RUN npm install --only=production && npm cache clean --force
+
+COPY src ./src
+
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodeapp -u 1001 && \
     mkdir -p /app/logs && \
@@ -32,7 +18,8 @@ RUN addgroup -g 1001 -S nodejs && \
 USER nodeapp
 
 EXPOSE 5000
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s \
+
+HEALTHCHECK --interval=30s --timeout=10s \
     CMD curl -f http://localhost:5000/health || exit 1
 
 CMD ["node", "src/server.js"]
