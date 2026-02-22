@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files - NEVER commit these
+.env
+backend/.env
+frontend/.env.local
+*.env.local
+
+# Logs
+logs/
+*.log
+
+# Build output
+frontend/build/
+frontend/dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files (uploaded reports before processing)
+/tmp/
+*.tmp
+
+# SSL certificates - never commit
+nginx/ssl/*.pem
+nginx/ssl/*.key
